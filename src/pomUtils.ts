@@ -6,7 +6,7 @@ import { MavenDependency } from './mavenDependency';
 export class PomUtils {
 
     constructor(private workspaceRoot: string | undefined) { }
-
+    /** Decides whether there is a pom file in the workspace root and if it is a mule api pom */
     public isMulePom(): boolean {
 
         let pomDoc = this.getPomDocument();
@@ -91,7 +91,12 @@ export class PomUtils {
         let pomDoc = this.getPomDocument();
 
         if (pomDoc) {
-            let dependencyNodes = this.getDependenciesNode()?.getElementsByTagName('dependency');
+            let dependenciesNode = this.getDependenciesNode(pomDoc);
+
+            if (!dependenciesNode)
+                return;
+
+            let dependencyNodes = dependenciesNode.getElementsByTagName('dependency');
 
             if (dependencyNodes) {
                 for (let i = 0; i < dependencyNodes.length; i++) {
@@ -106,20 +111,26 @@ export class PomUtils {
                         if (dependency.groupId === groupId &&
                             dependency.artifactId === artifactId &&
                             dependency.version === version) {
-                            dependencyNode.remove();
+
+                            dependencyNode.parentNode.removeChild(dependencyNode);
+
+                            console.debug('removed a dependency ' + dependencyNode);
+                            break;
                         }
 
                     } catch (e) {
-                        console.error("ran into a problem trying to read pom dependencies");
+                        console.error("ran into a problem trying to read pom dependencies: " + e.message);
                         return [];
                     }
                 }
             }
+
+            this.setDependenciesNode(dependenciesNode, pomDoc);
         }
 
-        this.setPomDocument(pomDoc);
     }
 
+    /** Reusable method to read the dependecies in the pom file with an optional filter to help find mule connectors */
     private readPomDependencies(classifierFilter: string | undefined): MavenDependency[] {
         let pomDependencies: MavenDependency[] = [];
 
@@ -153,6 +164,7 @@ export class PomUtils {
         return pomDependencies;
     }
 
+    /** Reusable method to parse the pom file down to just the dependencies section */
     private getDependenciesNode(pomDoc?: Document): Element | undefined {
 
         if (!pomDoc) {
@@ -168,6 +180,27 @@ export class PomUtils {
         }
 
         return undefined;
+    }
+
+    /** Reusable method to write out the pom file with the new dependencies section */
+    private setDependenciesNode(dependenciesElement: Element, pomDoc?: Document) {
+
+        if (!pomDoc) {
+            pomDoc = this.getPomDocument();
+        }
+
+        if (pomDoc) {
+            const dependenciesNodes = pomDoc.documentElement.getElementsByTagName('dependencies');
+
+            if (dependenciesNodes.length === 1) {
+
+                dependenciesNodes[0].parentNode.removeChild(dependenciesNodes[0]);
+                dependenciesNodes[0].parentNode.appendChild(dependenciesElement);
+
+                this.setPomDocument(pomDoc);
+            }
+        }
+
     }
 
     /** Reusable method to read and parse the pom file from this workspace */
