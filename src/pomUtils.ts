@@ -46,14 +46,17 @@ export class PomUtils {
         return false;
     }
 
+    /** Reads all the dependencies in the pom file */
     public getPomDependencies(): MavenDependency[] {
         return this.readPomDependencies(undefined);
     }
 
+    /** Reads all the dependencies that have the 'mule-plugin' classifier (which indicates a mule connector) */
     public getMuleConnectorDependencies(): MavenDependency[] {
         return this.readPomDependencies('mule-plugin');
     }
 
+    /** Adds a matching dependency in the pom file and writes it back to the file */
     public addPomDependency(dependency: MavenDependency) {
         let pomDoc = this.getPomDocument();
 
@@ -83,10 +86,44 @@ export class PomUtils {
         this.setPomDocument(pomDoc);
     }
 
+    /** Finds a matching dependency in the pom file and removes it */
+    public removePomDependency(dependency: MavenDependency) {
+        let pomDoc = this.getPomDocument();
+
+        if (pomDoc) {
+            let dependencyNodes = this.getDependenciesNode()?.getElementsByTagName('dependency');
+
+            if (dependencyNodes) {
+                for (let i = 0; i < dependencyNodes.length; i++) {
+                    try {
+                        let dependencyNode = dependencyNodes.item(i);
+
+                        // get the groupid, artifactid, and version of this dependency (all required so assume they are present or fail completely)
+                        let groupId = dependencyNode.getElementsByTagName('groupId').item(0).textContent;
+                        let artifactId = dependencyNode.getElementsByTagName('artifactId').item(0).textContent;
+                        let version = dependencyNode.getElementsByTagName('version').item(0).textContent;
+
+                        if (dependency.groupId === groupId &&
+                            dependency.artifactId === artifactId &&
+                            dependency.version === version) {
+                            dependencyNode.remove();
+                        }
+
+                    } catch (e) {
+                        console.error("ran into a problem trying to read pom dependencies");
+                        return [];
+                    }
+                }
+            }
+        }
+
+        this.setPomDocument(pomDoc);
+    }
+
     private readPomDependencies(classifierFilter: string | undefined): MavenDependency[] {
         let pomDependencies: MavenDependency[] = [];
 
-        const dependencyNodes = this.getDependenciesNode().getElementsByTagName('dependency');
+        const dependencyNodes = this.getDependenciesNode()?.getElementsByTagName('dependency');
 
         for (let i = 0; i < dependencyNodes.length; i++) {
             try {
@@ -133,6 +170,7 @@ export class PomUtils {
         return undefined;
     }
 
+    /** Reusable method to read and parse the pom file from this workspace */
     private getPomDocument() {
         let pomFile = path.join(this.workspaceRoot, 'pom.xml');
         if (this.pathExists(pomFile)) {
@@ -145,6 +183,7 @@ export class PomUtils {
         return undefined;
     }
 
+    /** Reusable method to serialize the pom and rewrite it to the file */
     private setPomDocument(pomDoc: Document) {
         let pomString = new XMLSerializer().serializeToString(pomDoc);
 
