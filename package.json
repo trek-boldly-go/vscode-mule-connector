@@ -213,6 +213,7 @@
 		"typescript": "^4.3.5"
 	},
 	"dependencies": {
+		"@xmldom/xmldom": "^0.7.4",
 		"ftp": "^0.3.10",
 		"jsonc-parser": "^0.4.2",
 		"minimist": "^0.2.1",
