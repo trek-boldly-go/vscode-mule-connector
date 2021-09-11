@@ -130,6 +130,51 @@ export class PomUtils {
 
     }
 
+    public updatePomDependencyVersion(dependency: MavenDependency) {
+        let pomDoc = this.getPomDocument();
+
+        if (pomDoc) {
+            let dependenciesNode = this.getDependenciesNode(pomDoc);
+
+            if (!dependenciesNode)
+                return;
+
+            let dependencyNodes = dependenciesNode.getElementsByTagName('dependency');
+
+            if (dependencyNodes) {
+                for (let i = 0; i < dependencyNodes.length; i++) {
+                    try {
+                        let dependencyNode = dependencyNodes.item(i);
+
+                        // get the groupid, artifactid, and version of this dependency (all required so assume they are present or fail completely)
+                        let groupId = dependencyNode.getElementsByTagName('groupId').item(0).textContent;
+                        let artifactId = dependencyNode.getElementsByTagName('artifactId').item(0).textContent;
+                        // let version = dependencyNode.getElementsByTagName('version').item(0).textContent;
+
+                        if (dependency.groupId === groupId &&
+                            dependency.artifactId === artifactId //&&
+                            // dependency.version === version
+                        ) {
+
+                            dependencyNode.getElementsByTagName('version').item(0).textContent = dependency.version;
+
+                            // dependencyNode.parentNode.removeChild(dependencyNode);
+
+                            console.debug('removed a dependency ' + dependencyNode);
+                            break;
+                        }
+
+                    } catch (e) {
+                        console.error("ran into a problem trying to read pom dependencies: " + e.message);
+                        return [];
+                    }
+                }
+            }
+
+            this.setDependenciesNode(dependenciesNode, pomDoc);
+        }
+    }
+
     /** Reusable method to read the dependecies in the pom file with an optional filter to help find mule connectors */
     private readPomDependencies(classifierFilter: string | undefined): MavenDependency[] {
         let pomDependencies: MavenDependency[] = [];

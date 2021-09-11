@@ -73,7 +73,9 @@ export class MuleDependency extends vscode.TreeItem {
 
 	constructor(
 		public readonly label: string,
-		private readonly version: string,
+		public readonly groupId: string,
+		public readonly artifactId: string,
+		public readonly version: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		public readonly command?: vscode.Command
 	) {
@@ -92,7 +94,21 @@ export class MuleDependency extends vscode.TreeItem {
 
 	public static fromMavenDep(mavenDep: MavenDependency) {
 		return new MuleDependency(`${mavenDep.groupId}:${mavenDep.artifactId}`,
+			mavenDep.groupId,
+			mavenDep.artifactId,
 			mavenDep.version,
 			vscode.TreeItemCollapsibleState.None);
+	}
+
+	public static toMavenDep(muleDep: MuleDependency) {
+		return {
+			groupId: muleDep.groupId,
+			artifactId: muleDep.artifactId,
+			version: muleDep.version
+		} as MavenDependency;
+	}
+
+	public removeFromPom(workspaceRoot: string) {
+		new PomUtils(workspaceRoot).removePomDependency(MuleDependency.toMavenDep(this));
 	}
 }
