@@ -60,7 +60,7 @@
 			},
 			{
 				"command": "importedConnectors.editEntry",
-				"title": "Edit",
+				"title": "Select Version",
 				"icon": {
 					"light": "resources/light/edit.svg",
 					"dark": "resources/dark/edit.svg"

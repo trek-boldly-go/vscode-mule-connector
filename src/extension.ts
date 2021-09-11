@@ -21,7 +21,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.showInformationMessage(`This button is in-progress and the versions you see listed are a static list. Called on: ${node.label}.`)
 
 		vscode.window.showQuickPick([
-			{ label: node.version, description: "current" } as vscode.QuickPickItem,
+			{ label: node.version, description: "Current Version" } as vscode.QuickPickItem,
 			{ label: "1.10.4" } as vscode.QuickPickItem,
 			{ label: "1.10.3" } as vscode.QuickPickItem,
 			{ label: "1.10.2" } as vscode.QuickPickItem,
