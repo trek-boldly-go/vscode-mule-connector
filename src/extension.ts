@@ -2,25 +2,22 @@
 
 import * as vscode from 'vscode';
 
-import { DepNodeProvider, Dependency } from './nodeDependencies';
-import { JsonOutlineProvider } from './jsonOutline';
-import { FtpExplorer } from './ftpExplorer';
-import { FileExplorer } from './fileExplorer';
-// import { TestViewDragAndDrop } from './testViewDragAndDrop';
-import { TestView } from './testView';
+import { DepMuleProvider, MuleDependency } from './muleDependencies';
 
 export function activate(context: vscode.ExtensionContext) {
 	const rootPath = (vscode.workspace.workspaceFolders && (vscode.workspace.workspaceFolders.length > 0))
 		? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined;
 
 	// Samples of `window.registerTreeDataProvider`
-	const nodeDependenciesProvider = new DepNodeProvider(rootPath);
-	vscode.window.registerTreeDataProvider('nodeDependencies', nodeDependenciesProvider);
-	vscode.commands.registerCommand('nodeDependencies.refreshEntry', () => nodeDependenciesProvider.refresh());
-	vscode.commands.registerCommand('extension.openPackageOnNpm', moduleName => vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(`https://www.npmjs.com/package/${moduleName}`)));
-	vscode.commands.registerCommand('nodeDependencies.addEntry', () => vscode.window.showInformationMessage(`Successfully called add entry.`));
-	vscode.commands.registerCommand('nodeDependencies.editEntry', (node: Dependency) => vscode.window.showInformationMessage(`Successfully called edit entry on ${node.label}.`));
-	vscode.commands.registerCommand('nodeDependencies.deleteEntry', (node: Dependency) => vscode.window.showInformationMessage(`Successfully called delete entry on ${node.label}.`));
+	const nodeDependenciesProvider = new DepMuleProvider(rootPath);
+	vscode.window.registerTreeDataProvider('importedConnectors', nodeDependenciesProvider);
+	vscode.commands.registerCommand('importedConnectors.refreshEntry', () => nodeDependenciesProvider.refresh());
+	// vscode.commands.registerCommand('extension.openPackageOnNpm', moduleName => vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(`https://www.npmjs.com/package/${moduleName}`)));
+	// vscode.commands.registerCommand('importedConnectors.addEntry', () => vscode.window.showInformationMessage(`Successfully called add entry.`));
+
+	// TODO: hook these buttons up to exchange client and pomutils as needed.
+	vscode.commands.registerCommand('importedConnectors.editEntry', (node: MuleDependency) => vscode.window.showInformationMessage(`This button is in-progress. Called on: ${node.label}.`));
+	vscode.commands.registerCommand('importedConnectors.deleteEntry', (node: MuleDependency) => vscode.window.showInformationMessage(`This button is in-progress. Called on: ${node.label}.`));
 
 	// const jsonOutlineProvider = new JsonOutlineProvider(context);
 	// vscode.window.registerTreeDataProvider('jsonOutline', jsonOutlineProvider);
