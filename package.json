@@ -7,6 +7,7 @@
 	"enableProposedApi": true,
 	"private": true,
 	"license": "MIT",
+	"type": "module",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Microsoft/vscode-extension-samples"
@@ -122,6 +123,7 @@
 	},
 	"dependencies": {
 		"@xmldom/xmldom": "^0.7.4",
+		"axios": "^0.21.4",
 		"ftp": "^0.3.10",
 		"jsonc-parser": "^0.4.2",
 		"minimist": "^0.2.1",
