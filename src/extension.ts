@@ -2,15 +2,22 @@
 
 import * as vscode from 'vscode';
 
-import { DepMuleProvider, MuleDependency } from './muleDependencies';
+import { ImportedMuleDepProvider, FeaturedMuleDepProvider, MuleDependency } from './muleDependencies';
 import { PomUtils } from './pomUtils';
 
 export function activate(context: vscode.ExtensionContext) {
 	const rootPath = (vscode.workspace.workspaceFolders && (vscode.workspace.workspaceFolders.length > 0))
 		? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined;
 
+	setupImportedConnectorsView(rootPath);
+	setupFeaturedConnectorsView(rootPath);
+
+}
+
+const setupImportedConnectorsView = (rootPath: string) => {
+
 	// creates a provider to populate the tree view
-	const muleDependenciesProvider = new DepMuleProvider(rootPath);
+	const muleDependenciesProvider = new ImportedMuleDepProvider(rootPath);
 	vscode.window.registerTreeDataProvider('importedConnectors', muleDependenciesProvider);
 	vscode.commands.registerCommand('importedConnectors.refreshEntry', () => muleDependenciesProvider.refresh());
 	// vscode.commands.registerCommand('extension.openPackageOnNpm', moduleName => vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(`https://www.npmjs.com/package/${moduleName}`)));
@@ -21,7 +28,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.showInformationMessage(`This button is in-progress and the versions you see listed are a static list. Called on: ${node.label}.`)
 
 		vscode.window.showQuickPick([
-			{ label: node.version, description: "Current Version" } as vscode.QuickPickItem,
+			{ label: node.mavenDependency.version, description: "Current Version" } as vscode.QuickPickItem,
 			{ label: "1.10.4" } as vscode.QuickPickItem,
 			{ label: "1.10.3" } as vscode.QuickPickItem,
 			{ label: "1.10.2" } as vscode.QuickPickItem,
@@ -30,7 +37,7 @@ export function activate(context: vscode.ExtensionContext) {
 			onDidSelectItem: (selectedVersion) => {
 
 				// we shouldn't touch the pom file if the current version is selected from the picker
-				if ((selectedVersion as vscode.QuickPickItem).label === node.version)
+				if ((selectedVersion as vscode.QuickPickItem).label === node.mavenDependency.version)
 					return;
 
 				// take the existing dep, and change the version
@@ -53,4 +60,12 @@ export function activate(context: vscode.ExtensionContext) {
 		// must refresh the view now that the dep is gone
 		muleDependenciesProvider.refresh();
 	});
+}
+
+
+const setupFeaturedConnectorsView = (rootPath: string) => {
+
+	// creates a provider to populate the tree view
+	const muleDependenciesProvider = new FeaturedMuleDepProvider(rootPath);
+	vscode.window.registerTreeDataProvider('exchangeFeatured', muleDependenciesProvider);
 }

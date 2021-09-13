@@ -1,8 +1,10 @@
 {
 	"compilerOptions": {
 		"module": "commonjs",
-		"target": "es6",
-		"lib": ["ES6"],
+		"target": "es2019",
+		"lib": [
+			"ES2019"
+		],
 		"outDir": "out",
 		"sourceMap": true,
 		"rootDir": "src"

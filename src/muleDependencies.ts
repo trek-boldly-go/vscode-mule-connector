@@ -3,8 +3,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { MavenDependency } from './mavenDependency';
 import { PomUtils } from './pomUtils';
+import { getAllAssets } from './exchangeClient';
 
-export class DepMuleProvider implements vscode.TreeDataProvider<MuleDependency> {
+export class ImportedMuleDepProvider implements vscode.TreeDataProvider<MuleDependency> {
 
 	private _onDidChangeTreeData: vscode.EventEmitter<MuleDependency | undefined | void> = new vscode.EventEmitter<MuleDependency | undefined | void>();
 	readonly onDidChangeTreeData: vscode.Event<MuleDependency | undefined | void> = this._onDidChangeTreeData.event;
@@ -69,20 +70,64 @@ export class DepMuleProvider implements vscode.TreeDataProvider<MuleDependency> 
 	}
 }
 
+export class FeaturedMuleDepProvider implements vscode.TreeDataProvider<MuleDependency> {
+
+	private _onDidChangeTreeData: vscode.EventEmitter<MuleDependency | undefined | void> = new vscode.EventEmitter<MuleDependency | undefined | void>();
+	readonly onDidChangeTreeData: vscode.Event<MuleDependency | undefined | void> = this._onDidChangeTreeData.event;
+
+	constructor(private workspaceRoot: string | undefined) {
+	}
+
+	refresh(): void {
+		this._onDidChangeTreeData.fire();
+	}
+
+	getTreeItem(element: MuleDependency): vscode.TreeItem {
+		return element;
+	}
+
+	getChildren(element?: MuleDependency): Thenable<MuleDependency[]> {
+		if (!this.workspaceRoot) {
+			vscode.window.showInformationMessage('No dependency in empty workspace');
+			return Promise.resolve([]);
+		}
+
+		if (element) {
+			// we only care about the root level of this view being mule deps, return nothing for children
+			return Promise.resolve([]);
+		} else {
+			return Promise.resolve(getAllAssets()).then((response: any) => {
+				return response.data.map(exchangeItem => {
+					return MuleDependency.fromMavenDep({
+						groupId: exchangeItem.groupId,
+						artifactId: exchangeItem.assetId
+					} as MavenDependency);
+				});
+			});
+		}
+
+	}
+
+}
+
 export class MuleDependency extends vscode.TreeItem {
 
 	constructor(
 		public readonly label: string,
-		public readonly groupId: string,
-		public readonly artifactId: string,
-		public readonly version: string,
+		public readonly mavenDependency: MavenDependency,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		public readonly command?: vscode.Command
 	) {
 		super(label, collapsibleState);
 
-		this.tooltip = `${this.label}-${this.version}`;
-		this.description = this.version;
+		if (this.mavenDependency.version) {
+			this.tooltip = `${this.label}-${this.mavenDependency.version}`;
+			this.description = this.mavenDependency.version;
+		}
+		else {
+			this.tooltip = this.label;
+			// this.description = this.mavenDependency.version;
+		}
 	}
 
 	iconPath = {
@@ -94,17 +139,15 @@ export class MuleDependency extends vscode.TreeItem {
 
 	public static fromMavenDep(mavenDep: MavenDependency) {
 		return new MuleDependency(`${mavenDep.groupId}:${mavenDep.artifactId}`,
-			mavenDep.groupId,
-			mavenDep.artifactId,
-			mavenDep.version,
+			mavenDep,
 			vscode.TreeItemCollapsibleState.None);
 	}
 
 	public static toMavenDep(muleDep: MuleDependency) {
 		return {
-			groupId: muleDep.groupId,
-			artifactId: muleDep.artifactId,
-			version: muleDep.version
+			groupId: muleDep.mavenDependency.groupId,
+			artifactId: muleDep.mavenDependency.artifactId,
+			version: muleDep.mavenDependency.version
 		} as MavenDependency;
 	}
 
