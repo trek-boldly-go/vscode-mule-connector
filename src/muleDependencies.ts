@@ -96,7 +96,7 @@ export class FeaturedMuleDepProvider implements vscode.TreeDataProvider<MuleDepe
 			// we only care about the root level of this view being mule deps, return nothing for children
 			return Promise.resolve([]);
 		} else {
-			return Promise.resolve(getAllAssets()).then((response: any) => {
+			return Promise.resolve(getAllAssets('extension')).then((response: any) => {
 				return response.data.map(exchangeItem => {
 					return MuleDependency.fromMavenDep({
 						groupId: exchangeItem.groupId,

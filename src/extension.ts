@@ -52,6 +52,35 @@ const setupImportedConnectorsView = (rootPath: string) => {
 		})
 	});
 
+	// TODO: when the exchange client is ready to go, make this pull a list of versions that the user can pick from to make updates easier
+	vscode.commands.registerCommand('exchangeFeatured.addEntry', (node: MuleDependency) => {
+		vscode.window.showInformationMessage(`This button is in-progress and the versions you see listed are a static list. Called on: ${node.label}.`)
+
+		vscode.window.showQuickPick([
+			{ label: node.mavenDependency.version, description: "Current Version" } as vscode.QuickPickItem,
+			{ label: "1.10.4" } as vscode.QuickPickItem,
+			{ label: "1.10.3" } as vscode.QuickPickItem,
+			{ label: "1.10.2" } as vscode.QuickPickItem,
+			{ label: "1.10.1" } as vscode.QuickPickItem
+		], {
+			onDidSelectItem: (selectedVersion) => {
+
+				// we shouldn't touch the pom file if the current version is selected from the picker
+				if ((selectedVersion as vscode.QuickPickItem).label === node.mavenDependency.version)
+					return;
+
+				// take the existing dep, and change the version
+				let newDep = MuleDependency.toMavenDep(node);
+				newDep.version = (selectedVersion as vscode.QuickPickItem).label;
+
+				// add the new dep to the pom file
+				new PomUtils(rootPath).updatePomDependencyVersion(newDep);
+			},
+			canPickMany: false,
+			title: "Connector Version Selection"
+		})
+	});
+
 	// event handler for the delete button on a dep
 	vscode.commands.registerCommand('importedConnectors.deleteEntry', (node: MuleDependency) => {
 		// removes the dep from the pom file
