@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { MavenDependency } from './mavenDependency';
 import { PomUtils } from './pomUtils';
-import { getAllAssets } from './exchangeClient';
+import { getAsset } from './exchangeClient';
 
 export class ImportedMuleDepProvider implements vscode.TreeDataProvider<MuleDependency> {
 
@@ -75,7 +75,10 @@ export class FeaturedMuleDepProvider implements vscode.TreeDataProvider<MuleDepe
 	private _onDidChangeTreeData: vscode.EventEmitter<MuleDependency | undefined | void> = new vscode.EventEmitter<MuleDependency | undefined | void>();
 	readonly onDidChangeTreeData: vscode.Event<MuleDependency | undefined | void> = this._onDidChangeTreeData.event;
 
+	private featuredConnectors: { groupId: string, artifactId: string }[] = [];
+
 	constructor(private workspaceRoot: string | undefined) {
+		this.featuredConnectors = vscode.workspace.getConfiguration('mulesoft.exchange').get('featuredConnectors');
 	}
 
 	refresh(): void {
@@ -96,18 +99,15 @@ export class FeaturedMuleDepProvider implements vscode.TreeDataProvider<MuleDepe
 			// we only care about the root level of this view being mule deps, return nothing for children
 			return Promise.resolve([]);
 		} else {
-			return Promise.resolve(getAllAssets('extension')).then((response: any) => {
-				return response.data.map(exchangeItem => {
-					return MuleDependency.fromMavenDep({
-						groupId: exchangeItem.groupId,
-						artifactId: exchangeItem.assetId
-					} as MavenDependency);
-				});
-			});
+			return Promise.all(this.featuredConnectors.map(async connector => {
+				let asset = await getAsset(connector.groupId, connector.artifactId);
+
+				return new MuleDependency(`${asset.data.groupId}:${asset.data.assetId}`,
+					{ groupId: asset.data.groupId, artifactId: asset.data.assetId } as MavenDependency,
+					vscode.TreeItemCollapsibleState.None);
+			}));
 		}
-
 	}
-
 }
 
 export class MuleDependency extends vscode.TreeItem {
