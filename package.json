@@ -1,15 +1,15 @@
 {
-	"name": "custom-view-samples",
-	"displayName": "Custom view Samples",
-	"description": "Samples for VSCode's view API",
+	"name": "mule-exchange-tools",
+	"displayName": "Mulesoft Exchange Tools",
+	"description": "A set of tools for managing anypoint exchange connector dependencies in a mule 4 project.",
 	"version": "0.0.1",
-	"publisher": "vscode-samples",
+	"publisher": "dsimpson",
 	"enableProposedApi": true,
 	"private": true,
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-extension-samples"
+		"url": "https://github.com/dsimpsonSinia/vscode-mule-connector"
 	},
 	"engines": {
 		"vscode": "^1.57.0"
@@ -69,6 +69,14 @@
 			{
 				"command": "importedConnectors.deleteEntry",
 				"title": "Delete"
+			},
+			{
+				"command": "exchangeFeatured.addEntry",
+				"title": "Add",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
+				}
 			}
 		],
 		"menus": {
@@ -87,6 +95,10 @@
 				{
 					"command": "importedConnectors.deleteEntry",
 					"when": "view == importedConnectors && viewItem == dependency"
+				},
+				{
+					"command": "exchangeFeatured.addEntry",
+					"when": "view == exchangeFeatured && viewItem == dependency"
 				}
 			]
 		},
@@ -96,7 +108,100 @@
 				"properties": {
 					"mulesoft.exchange.featuredConnectors": {
 						"type": "array",
-						"default": [],
+						"default": [
+							{
+								"groupId": "org.mule.modules",
+								"artifactId": "mule-soapkit-module"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-email-connector"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-db-connector"
+							},
+							{
+								"groupId": "org.mule.modules",
+								"artifactId": "mule-apikit-module"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-ftp-connector"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-file-connector"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-http-connector"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-jms-connector"
+							},
+							{
+								"groupId": "org.mule.module",
+								"artifactId": "mule-java-module"
+							},
+							{
+								"groupId": "com.mulesoft.connectors",
+								"artifactId": "mule-netsuite-connector"
+							},
+							{
+								"groupId": "org.mule.modules",
+								"artifactId": "mule-oauth-module"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-objectstore-connector"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-sftp-connector"
+							},
+							{
+								"groupId": "com.mulesoft.connectors",
+								"artifactId": "mule-salesforce-connector"
+							},
+							{
+								"groupId": "org.mule.modules",
+								"artifactId": "mule-scripting-module"
+							},
+							{
+								"groupId": "com.mulesoft.connectors",
+								"artifactId": "mule-servicenow-connector"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-sockets-connector"
+							},
+							{
+								"groupId": "org.mule.modules",
+								"artifactId": "mule-spring-module"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-vm-connector"
+							},
+							{
+								"groupId": "org.mule.modules",
+								"artifactId": "mule-validation-module"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-wsc-connector"
+							},
+							{
+								"groupId": "com.mulesoft.connectors",
+								"artifactId": "mule-workday-connector"
+							},
+							{
+								"groupId": "org.mule.modules",
+								"artifactId": "mule-xml-module"
+							}
+						],
 						"scope": "window",
 						"description": "An array of maven dependencies in the format { groupId: string, artifactId: string } which are considered 'featured' and make it easier to add to projects."
 					}
@@ -113,19 +218,22 @@
 	"devDependencies": {
 		"@types/mkdirp": "^0.5.2",
 		"@types/node": "^12.12.0",
+		"@types/qs": "^6.9.7",
 		"@types/rimraf": "^2.0.2",
 		"@types/vscode": "^1.52.0",
 		"@typescript-eslint/eslint-plugin": "^4.16.0",
 		"@typescript-eslint/parser": "^4.16.0",
 		"eslint": "^7.21.0",
-		"typescript": "^4.3.5"
+		"typescript": "^4.4.2"
 	},
 	"dependencies": {
 		"@xmldom/xmldom": "^0.7.4",
+		"axios": "^0.21.4",
 		"ftp": "^0.3.10",
 		"jsonc-parser": "^0.4.2",
 		"minimist": "^0.2.1",
 		"mkdirp": "^0.5.1",
+		"qs": "^6.10.1",
 		"rimraf": "^2.6.2"
 	}
 }

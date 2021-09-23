@@ -1,51 +1,15 @@
-# Views & View Containers
+# Anypoint Exchange
 
-This sample demonstrates how to implement and contribute a tree view in VS Code. This includes:
+Anypoint Exchange is a maven artifact repository hosted by Mulesoft in the Anypoint Platform. See [here](https://www.mulesoft.com/exchange/) for more info.
 
-- Contributing views and view containers.
-- Contributing actions in various location of the view.
-- Implementing the tree data provider for the view.
-- Creating and working with the view.
 
-This sample provides following views
 
-- Node dependencies view
-- Ftp file explorer view
+# Contributing
 
-Following example shows Node dependencies view in Package Explorer View container.
+## Running the code
 
-![Package Explorer](./resources/package-explorer.png)
-
-## VS Code API
-
-This sample uses following contribution points, activation events and APIs
-
-### Contribution Points
-
-- `views`
-- `viewsContainers`
-- `menu`
-  - `view/title`
-  - `view/item/context`
-
-### Activation Events
-
-- `onView:${viewId}`
-
-### APIs
-
-- `window.createTreeView`
-- `window.registerTreeDataProvider`
-- `TreeView`
-- `TreeDataProvider`
-
-Refer to [Usage](./USAGE.md) document for more details.
-
-## Running the Sample
-
-- Open this example in VS Code Insiders
+- Open this example in VS Code
 - `npm install`
 - `npm run watch`
 - `F5` to start debugging
-- Node dependencies view is shown in Package explorer view container in Activity bar.
-- FTP file explorer view should be shown in Explorer
+- Mule dependencies view is shown in Mule tools view container in Activity bar.

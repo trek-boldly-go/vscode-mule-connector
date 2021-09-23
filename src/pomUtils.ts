@@ -56,6 +56,16 @@ export class PomUtils {
         return this.readPomDependencies('mule-plugin');
     }
 
+    public containsMuleConnectorDependency(mavenDep: MavenDependency, matchVersion: boolean = false): boolean {
+        if (this.readPomDependencies('mule-plugin').find(dep =>
+            mavenDep.groupId == dep.groupId &&
+            mavenDep.artifactId == dep.artifactId &&
+            (!matchVersion || mavenDep.version == dep.version)))
+            return true;
+        else
+            return false;
+    }
+
     /** Adds a matching dependency in the pom file and writes it back to the file */
     public addPomDependency(dependency: MavenDependency) {
         let pomDoc = this.getPomDocument();

@@ -5,3 +5,4 @@ target/
 .classpath
 .project
 pom.xml
+src/test.js
