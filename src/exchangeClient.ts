@@ -1,7 +1,7 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import * as qs from 'qs';
 
-export async function getAllAssets(params: AssetSearchParams): Promise<undefined | any> {
+export async function getAllAssets(params: AssetSearchParams): Promise<undefined | AxiosResponse<any>> {
     try {
         return await (axios.get('https://anypoint.mulesoft.com/exchange/api/v2/assets/search', {
             params,
@@ -14,21 +14,9 @@ export async function getAllAssets(params: AssetSearchParams): Promise<undefined
     }
 }
 
-export async function getAsset(groupId: string, assetId: string): Promise<undefined | {
-    data: FullAsset,
-    status: number,
-    statusText: string,
-    headers: any,
-    request?: any,
-}> {
+export async function getAsset(groupId: string, assetId: string): Promise<undefined | AxiosResponse<FullAsset>> {
     try {
-        return await (axios.get(`https://anypoint.mulesoft.com/exchange/api/v2/assets/${groupId}/${assetId}/asset`)) as {
-            data: FullAsset,
-            status: number,
-            statusText: string,
-            headers: any,
-            request?: any,
-        };
+        return await (axios.get(`https://anypoint.mulesoft.com/exchange/api/v2/assets/${groupId}/${assetId}/asset`)) as AxiosResponse<FullAsset>;
     }
     catch (error) {
         console.error(error);
