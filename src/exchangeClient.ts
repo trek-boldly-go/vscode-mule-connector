@@ -1,25 +1,38 @@
 import axios from 'axios';
-import * as vscode from 'vscode';
+import * as qs from 'qs';
 
-export function getAllAssets(type?: string) {
+export async function getAllAssets(params: AssetSearchParams): Promise<undefined | any> {
     try {
-        if (type) {
-            return axios.get(`https://anypoint.mulesoft.com/exchange/api/v2/assets/search?types=${type}`);
-        } else {
-            return axios.get('https://anypoint.mulesoft.com/exchange/api/v2/assets/search');
-        }
+        return await (axios.get('https://anypoint.mulesoft.com/exchange/api/v2/assets/search', {
+            params,
+            paramsSerializer: paramsSerializer
+        })) as any;
     }
     catch (error) {
-        return error;
+        console.error(error);
+        return undefined;
     }
 }
 
-export function getAsset(groupId: string, assetId: string): Promise<undefined | { data: FullAsset }> {
+export async function getAsset(groupId: string, assetId: string): Promise<undefined | {
+    data: FullAsset,
+    status: number,
+    statusText: string,
+    headers: any,
+    request?: any,
+}> {
     try {
-        return (axios.get(`https://anypoint.mulesoft.com/exchange/api/v2/assets/${groupId}/${assetId}/asset`) as Promise<{ data: FullAsset }>).catch(error => { console.error(error); return undefined; });
+        return await (axios.get(`https://anypoint.mulesoft.com/exchange/api/v2/assets/${groupId}/${assetId}/asset`)) as {
+            data: FullAsset,
+            status: number,
+            statusText: string,
+            headers: any,
+            request?: any,
+        };
     }
     catch (error) {
-        return Promise.resolve(undefined);
+        console.error(error);
+        return undefined;
     }
 }
 
@@ -62,3 +75,27 @@ export interface FullAsset {
     "versions": string[]
 }
 
+// a type to allow search params to be sent to exchange api
+export interface AssetSearchParams {
+    types?: string,
+    limit?: number,
+    offset?: number,
+    sort?: string,
+    ascending?: boolean,
+    search?: string,
+    domain?: string,
+    organizationId?: string,
+    masterOrganizationId?: string,
+    minMuleVersion?: string,
+    sharedWithMe?: boolean,
+    includeSnapshots?: boolean
+}
+
+interface params {
+    [key: string]: string
+}
+
+// must override the default paramsSerializer so null params are skipped
+const paramsSerializer = (params: params): string => {
+    return qs.stringify(params, { skipNulls: true });
+}
