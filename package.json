@@ -51,7 +51,7 @@
 		},
 		"commands": [
 			{
-				"command": "importedConnectors.refreshEntry",
+				"command": "mule.importedConnectors.refreshEntry",
 				"title": "Refresh",
 				"icon": {
 					"light": "resources/light/refresh.svg",
@@ -59,7 +59,7 @@
 				}
 			},
 			{
-				"command": "importedConnectors.editEntry",
+				"command": "mule.importedConnectors.editEntry",
 				"title": "Select Version",
 				"icon": {
 					"light": "resources/light/edit.svg",
@@ -67,11 +67,11 @@
 				}
 			},
 			{
-				"command": "importedConnectors.deleteEntry",
+				"command": "mule.importedConnectors.deleteEntry",
 				"title": "Delete"
 			},
 			{
-				"command": "exchangeFeatured.addEntry",
+				"command": "mule.exchangeFeatured.addEntry",
 				"title": "Add",
 				"icon": {
 					"light": "resources/light/add.svg",
@@ -82,22 +82,22 @@
 		"menus": {
 			"view/title": [
 				{
-					"command": "importedConnectors.refreshEntry",
+					"command": "mule.importedConnectors.refreshEntry",
 					"when": "view == importedConnectors",
 					"group": "navigation"
 				}
 			],
 			"view/item/context": [
 				{
-					"command": "importedConnectors.editEntry",
+					"command": "mule.importedConnectors.editEntry",
 					"when": "view == importedConnectors && viewItem == dependency"
 				},
 				{
-					"command": "importedConnectors.deleteEntry",
+					"command": "mule.importedConnectors.deleteEntry",
 					"when": "view == importedConnectors && viewItem == dependency"
 				},
 				{
-					"command": "exchangeFeatured.addEntry",
+					"command": "mule.exchangeFeatured.addEntry",
 					"when": "view == exchangeFeatured && viewItem == dependency"
 				}
 			]

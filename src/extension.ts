@@ -27,10 +27,10 @@ const setupImportedConnectorsView = (rootPath: string) => {
 	vscode.window.registerTreeDataProvider('importedConnectors', muleDependenciesProvider);
 
 	// called when the refresh button is selected
-	vscode.commands.registerCommand('importedConnectors.refreshEntry', () => muleDependenciesProvider.refresh());
+	vscode.commands.registerCommand('mule.importedConnectors.refreshEntry', () => muleDependenciesProvider.refresh());
 
 	// called when the edit button is selected for an imported connector
-	vscode.commands.registerCommand('importedConnectors.editEntry', (node: MuleDependency) => {
+	vscode.commands.registerCommand('mule.importedConnectors.editEntry', (node: MuleDependency) => {
 		// must go get a list of versions we can use
 		getAsset(node.mavenDependency.groupId, node.mavenDependency.artifactId).then(asset => {
 
@@ -62,7 +62,7 @@ const setupImportedConnectorsView = (rootPath: string) => {
 	});
 
 	// event handler for the delete button on a dep
-	vscode.commands.registerCommand('importedConnectors.deleteEntry', (node: MuleDependency) => {
+	vscode.commands.registerCommand('mule.importedConnectors.deleteEntry', (node: MuleDependency) => {
 		// removes the dep from the pom file
 		node.removeFromPom(rootPath);
 
@@ -79,7 +79,7 @@ const setupFeaturedConnectorsView = (rootPath: string) => {
 	vscode.window.registerTreeDataProvider('exchangeFeatured', muleDependenciesProvider);
 
 	// called when the add button is pushed on a featured connector
-	vscode.commands.registerCommand('exchangeFeatured.addEntry', (node: MuleDependency) => {
+	vscode.commands.registerCommand('mule.exchangeFeatured.addEntry', (node: MuleDependency) => {
 
 		// must go get a list of versions
 		getAsset(node.mavenDependency.groupId, node.mavenDependency.artifactId).then(asset => {
