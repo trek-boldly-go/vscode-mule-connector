@@ -2,7 +2,7 @@
 	"name": "mule-exchange-tools",
 	"displayName": "Mulesoft Exchange Tools",
 	"description": "A set of tools for managing anypoint exchange connector dependencies in a mule 4 project.",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"publisher": "sinia",
 	"private": true,
 	"license": "MIT",
