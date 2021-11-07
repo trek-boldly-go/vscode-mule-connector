@@ -4,24 +4,19 @@ on:
   push:
     branches:
       - main
-name: 'Release Vscode Plugin'
+name: "Release Vscode Plugin"
 jobs:
   npmInstall:
     name: npm install
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - name: npm install
-        uses: actions/npm@master
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
         with:
-          args: install --unsafe-perm
-      - name: Master
-        uses: actions/bin/filter@master
+          node-version: "14"
+      - run: npm install
+      - name: Publish to Visual Studio Marketplace
+        uses: HaaLeo/publish-vscode-extension@v0
         with:
-          args: branch master
-      - name: Vscode release plugin
-        uses: JCofman/vscodeaction@master
-        env:
-          PUBLISHER_TOKEN: ${{ secrets.PUBLISHER_TOKEN }}
-        with:
-          args: publish -p $PUBLISHER_TOKEN
+          pat: ${{ secrets.PUBLISHER_TOKEN }}
+          registryUrl: https://marketplace.visualstudio.com
