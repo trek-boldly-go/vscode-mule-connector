@@ -20,5 +20,3 @@ jobs:
         with:
           pat: ${{ secrets.PUBLISHER_TOKEN }}
           registryUrl: https://marketplace.visualstudio.com
-          extensionFile: ${{ steps.publishToOpenVSX.outputs.vsixPath }}
-          packagePath: ""
