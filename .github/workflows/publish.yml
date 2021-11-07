@@ -10,13 +10,13 @@ jobs:
     name: npm install
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@main
       - name: npm install
-        uses: actions/npm@master
+        uses: actions/npm@main
         with:
           args: install --unsafe-perm
       - name: Master
-        uses: actions/bin/filter@master
+        uses: actions/bin/filter@main
         with:
           args: branch master
       - name: Vscode release plugin
