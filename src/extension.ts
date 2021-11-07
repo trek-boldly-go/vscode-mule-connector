@@ -1,41 +1,116 @@
 'use strict';
 
 import * as vscode from 'vscode';
+import { getAsset } from './exchangeClient';
+import { MavenDependency } from './mavenDependency';
 
-import { DepNodeProvider, Dependency } from './nodeDependencies';
-import { JsonOutlineProvider } from './jsonOutline';
-import { FtpExplorer } from './ftpExplorer';
-import { FileExplorer } from './fileExplorer';
-import { TestViewDragAndDrop } from './testViewDragAndDrop';
-import { TestView } from './testView';
+import { ImportedMuleDepProvider, FeaturedMuleDepProvider, MuleDependency } from './muleDependencies';
+import { PomUtils } from './pomUtils';
+
+let pomUtils: PomUtils = undefined;
 
 export function activate(context: vscode.ExtensionContext) {
 	const rootPath = (vscode.workspace.workspaceFolders && (vscode.workspace.workspaceFolders.length > 0))
 		? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined;
 
-	// Samples of `window.registerTreeDataProvider`
-	const nodeDependenciesProvider = new DepNodeProvider(rootPath);
-	vscode.window.registerTreeDataProvider('nodeDependencies', nodeDependenciesProvider);
-	vscode.commands.registerCommand('nodeDependencies.refreshEntry', () => nodeDependenciesProvider.refresh());
-	vscode.commands.registerCommand('extension.openPackageOnNpm', moduleName => vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(`https://www.npmjs.com/package/${moduleName}`)));
-	vscode.commands.registerCommand('nodeDependencies.addEntry', () => vscode.window.showInformationMessage(`Successfully called add entry.`));
-	vscode.commands.registerCommand('nodeDependencies.editEntry', (node: Dependency) => vscode.window.showInformationMessage(`Successfully called edit entry on ${node.label}.`));
-	vscode.commands.registerCommand('nodeDependencies.deleteEntry', (node: Dependency) => vscode.window.showInformationMessage(`Successfully called delete entry on ${node.label}.`));
+	pomUtils = new PomUtils(rootPath);
 
-	const jsonOutlineProvider = new JsonOutlineProvider(context);
-	vscode.window.registerTreeDataProvider('jsonOutline', jsonOutlineProvider);
-	vscode.commands.registerCommand('jsonOutline.refresh', () => jsonOutlineProvider.refresh());
-	vscode.commands.registerCommand('jsonOutline.refreshNode', offset => jsonOutlineProvider.refresh(offset));
-	vscode.commands.registerCommand('jsonOutline.renameNode', offset => jsonOutlineProvider.rename(offset));
-	vscode.commands.registerCommand('extension.openJsonSelection', range => jsonOutlineProvider.select(range));
+	setupImportedConnectorsView(rootPath);
+	setupFeaturedConnectorsView(rootPath);
 
-	// Samples of `window.createView`
-	new FtpExplorer(context);
-	new FileExplorer(context);
+}
 
-	// Test View
-	new TestView(context);
+const setupImportedConnectorsView = (rootPath: string) => {
 
-	// Drag and Drop sample
-	new TestViewDragAndDrop(context);
+	// creates a provider to populate the tree view
+	const muleDependenciesProvider = new ImportedMuleDepProvider(rootPath);
+	vscode.window.registerTreeDataProvider('importedConnectors', muleDependenciesProvider);
+
+	// called when the refresh button is selected
+	vscode.commands.registerCommand('mule.importedConnectors.refreshEntry', () => muleDependenciesProvider.refresh());
+
+	// called when the edit button is selected for an imported connector
+	vscode.commands.registerCommand('mule.importedConnectors.editEntry', (node: MuleDependency) => {
+		// must go get a list of versions we can use
+		getAsset(node.mavenDependency.groupId, node.mavenDependency.artifactId).then(asset => {
+
+			// put the current version at the top
+			let importedConnectorVersions = [{ label: node.mavenDependency.version, description: "Current Version" } as vscode.QuickPickItem];
+
+			// append the rest of the versions to the list
+			importedConnectorVersions = importedConnectorVersions.concat(asset.data.versions.map(version => { return { label: version } as vscode.QuickPickItem }))
+
+			// show the quick picker
+			vscode.window.showQuickPick(importedConnectorVersions, {
+				onDidSelectItem: (selectedVersion) => {
+
+					// we shouldn't touch the pom file if the current version is selected from the picker
+					if ((selectedVersion as vscode.QuickPickItem).label === node.mavenDependency.version)
+						return;
+
+					// take the existing dep, and change the version
+					let newDep = MuleDependency.toMavenDep(node);
+					newDep.version = (selectedVersion as vscode.QuickPickItem).label;
+
+					// add the new dep to the pom file
+					pomUtils.updatePomDependencyVersion(newDep);
+				},
+				canPickMany: false,
+				title: "Connector Version Selection"
+			});
+		});
+	});
+
+	// event handler for the delete button on a dep
+	vscode.commands.registerCommand('mule.importedConnectors.deleteEntry', (node: MuleDependency) => {
+		// removes the dep from the pom file
+		node.removeFromPom(rootPath);
+
+		// must refresh the view now that the dep is gone
+		muleDependenciesProvider.refresh();
+	});
+}
+
+
+const setupFeaturedConnectorsView = (rootPath: string) => {
+
+	// creates a provider to populate the tree view
+	const muleDependenciesProvider = new FeaturedMuleDepProvider(rootPath);
+	vscode.window.registerTreeDataProvider('exchangeFeatured', muleDependenciesProvider);
+
+	// called when the add button is pushed on a featured connector
+	vscode.commands.registerCommand('mule.exchangeFeatured.addEntry', (node: MuleDependency) => {
+
+		// must go get a list of versions
+		getAsset(node.mavenDependency.groupId, node.mavenDependency.artifactId).then(asset => {
+			// build a list of quick pick items for the versions
+			let quickPickVersions = asset.data.versions.map(version => { return { label: version } as vscode.QuickPickItem });
+
+			vscode.window.showQuickPick(quickPickVersions, {
+				onDidSelectItem: (selectedVersionPickItem) => {
+
+					let selectedVersion = (selectedVersionPickItem as vscode.QuickPickItem).label;
+
+					let mavenDep = {
+						groupId: asset.data.groupId,
+						artifactId: asset.data.assetId,
+						version: selectedVersion,
+						classifier: "mule-plugin"
+					} as MavenDependency;
+
+					// we don't want to duplicate this dep if it is already in the pom
+					if (pomUtils.containsMuleConnectorDependency(mavenDep)) {
+
+						// update the version of the dependency in the pom file
+						pomUtils.updatePomDependencyVersion(mavenDep);
+					} else {
+						// add the new dep to the pom file
+						pomUtils.addPomDependency(mavenDep);
+					}
+				},
+				canPickMany: false,
+				title: "Connector Version Selection"
+			})
+		});
+	});
 }

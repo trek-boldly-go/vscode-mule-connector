@@ -1,15 +1,15 @@
 {
-	"name": "custom-view-samples",
-	"displayName": "Custom view Samples",
-	"description": "Samples for VSCode's view API",
+	"name": "mule-exchange-tools",
+	"displayName": "Mulesoft Exchange Tools",
+	"description": "A set of tools for managing anypoint exchange connector dependencies in a mule 4 project.",
 	"version": "0.0.1",
-	"publisher": "vscode-samples",
+	"publisher": "sinia",
 	"enableProposedApi": true,
 	"private": true,
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-extension-samples"
+		"url": "https://github.com/dsimpsonSinia/vscode-mule-connector"
 	},
 	"engines": {
 		"vscode": "^1.57.0"
@@ -18,15 +18,9 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onView:nodeDependencies",
-		"onView:ftpExplorer",
-		"onView:jsonOutline",
-		"onView:fileExplorer",
-		"onView:testView",
-		"onView:testViewDragAndDrop",
-		"onLanguage:json",
-		"onLanguage:jsonc",
-		"onCommand:testView.reveal"
+		"onView:importedConnectors",
+		"onView:exchangeFeatured",
+		"onLanguage:xml"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -46,12 +40,18 @@
 					"name": "Featured Exchange Connectors",
 					"icon": "media/dep.svg",
 					"contextualTitle": "Mulesoft Tools"
+				},
+				{
+					"id": "importedConnectors",
+					"name": "Imported Connectors",
+					"icon": "media/dep.svg",
+					"contextualTitle": "Mulesoft Tools"
 				}
 			]
 		},
 		"commands": [
 			{
-				"command": "nodeDependencies.refreshEntry",
+				"command": "mule.importedConnectors.refreshEntry",
 				"title": "Refresh",
 				"icon": {
 					"light": "resources/light/refresh.svg",
@@ -59,138 +59,169 @@
 				}
 			},
 			{
-				"command": "nodeDependencies.addEntry",
-				"title": "Add"
-			},
-			{
-				"command": "nodeDependencies.editEntry",
-				"title": "Edit",
+				"command": "mule.importedConnectors.editEntry",
+				"title": "Select Version",
 				"icon": {
 					"light": "resources/light/edit.svg",
 					"dark": "resources/dark/edit.svg"
 				}
 			},
 			{
-				"command": "nodeDependencies.deleteEntry",
+				"command": "mule.importedConnectors.deleteEntry",
 				"title": "Delete"
 			},
 			{
-				"command": "ftpExplorer.refresh",
-				"title": "Refresh",
+				"command": "mule.exchangeFeatured.addEntry",
+				"title": "Add",
 				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
 				}
-			},
-			{
-				"command": "ftpExplorer.openFtpResource",
-				"title": "Open FTP Resource"
-			},
-			{
-				"command": "ftpExplorer.revealResource",
-				"title": "Reveal in FTP View"
-			},
-			{
-				"command": "jsonOutline.refresh",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
-			},
-			{
-				"command": "jsonOutline.refreshNode",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
-			},
-			{
-				"command": "jsonOutline.renameNode",
-				"title": "Rename"
-			},
-			{
-				"command": "fileExplorer.refreshFile",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
-			},
-			{
-				"command": "fileExplorer.openFile",
-				"title": "Open File"
-			},
-			{
-				"command": "testView.reveal",
-				"title": "Test View: Reveal"
-			},
-			{
-				"command": "testView.changeTitle",
-				"title": "Test View: Change Title"
 			}
 		],
 		"menus": {
-			"commandPalette": [
-				{
-					"command": "ftpExplorer.revealResource"
-				}
-			],
 			"view/title": [
 				{
-					"command": "nodeDependencies.refreshEntry",
-					"when": "view == nodeDependencies",
-					"group": "navigation"
-				},
-				{
-					"command": "nodeDependencies.addEntry",
-					"when": "view == nodeDependencies"
-				},
-				{
-					"command": "jsonOutline.refresh",
-					"when": "view == jsonOutline",
-					"group": "navigation"
-				},
-				{
-					"command": "ftpExplorer.refresh",
-					"when": "view == ftpExplorer",
+					"command": "mule.importedConnectors.refreshEntry",
+					"when": "view == importedConnectors",
 					"group": "navigation"
 				}
 			],
 			"view/item/context": [
 				{
-					"command": "nodeDependencies.editEntry",
-					"when": "view == nodeDependencies && viewItem == dependency",
-					"group": "inline"
+					"command": "mule.importedConnectors.editEntry",
+					"when": "view == importedConnectors && viewItem == dependency"
 				},
 				{
-					"command": "nodeDependencies.deleteEntry",
-					"when": "view == nodeDependencies && viewItem == dependency"
+					"command": "mule.importedConnectors.deleteEntry",
+					"when": "view == importedConnectors && viewItem == dependency"
 				},
 				{
-					"command": "jsonOutline.renameNode",
-					"when": "view == jsonOutline"
-				},
-				{
-					"command": "jsonOutline.refreshNode",
-					"when": "view == jsonOutline",
-					"group": "inline"
-				},
-				{
-					"command": "fileExplorer.refreshFile",
-					"when": "view == fileExplorer && viewItem == file",
-					"group": "inline"
+					"command": "mule.exchangeFeatured.addEntry",
+					"when": "view == exchangeFeatured && viewItem == dependency"
 				}
 			]
 		},
 		"configuration": [
 			{
-				"title": "JSON Outline",
+				"title": "Mulesoft",
 				"properties": {
-					"jsonOutline.autorefresh": {
-						"type": "boolean",
-						"default": false
+					"mulesoft.exchange.featuredConnectors": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"title": "Featured Connectors",
+							"required": [
+								"groupId",
+								"artifactId"
+							],
+							"properties": {
+								"groupId": {
+									"type": "string",
+									"minLength": 1
+								},
+								"artifactId": {
+									"type": "string",
+									"minLength": 1
+								}
+							}
+						},
+						"default": [
+							{
+								"groupId": "org.mule.modules",
+								"artifactId": "mule-soapkit-module"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-email-connector"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-db-connector"
+							},
+							{
+								"groupId": "org.mule.modules",
+								"artifactId": "mule-apikit-module"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-ftp-connector"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-file-connector"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-http-connector"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-jms-connector"
+							},
+							{
+								"groupId": "org.mule.module",
+								"artifactId": "mule-java-module"
+							},
+							{
+								"groupId": "com.mulesoft.connectors",
+								"artifactId": "mule-netsuite-connector"
+							},
+							{
+								"groupId": "org.mule.modules",
+								"artifactId": "mule-oauth-module"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-objectstore-connector"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-sftp-connector"
+							},
+							{
+								"groupId": "com.mulesoft.connectors",
+								"artifactId": "mule-salesforce-connector"
+							},
+							{
+								"groupId": "org.mule.modules",
+								"artifactId": "mule-scripting-module"
+							},
+							{
+								"groupId": "com.mulesoft.connectors",
+								"artifactId": "mule-servicenow-connector"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-sockets-connector"
+							},
+							{
+								"groupId": "org.mule.modules",
+								"artifactId": "mule-spring-module"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-vm-connector"
+							},
+							{
+								"groupId": "org.mule.modules",
+								"artifactId": "mule-validation-module"
+							},
+							{
+								"groupId": "org.mule.connectors",
+								"artifactId": "mule-wsc-connector"
+							},
+							{
+								"groupId": "com.mulesoft.connectors",
+								"artifactId": "mule-workday-connector"
+							},
+							{
+								"groupId": "org.mule.modules",
+								"artifactId": "mule-xml-module"
+							}
+						],
+						"scope": "window",
+						"description": "An array of maven dependencies in the format { groupId: string, artifactId: string } which are considered 'featured' and make it easier to add to projects."
 					}
 				}
 			}
@@ -205,18 +236,22 @@
 	"devDependencies": {
 		"@types/mkdirp": "^0.5.2",
 		"@types/node": "^12.12.0",
+		"@types/qs": "^6.9.7",
 		"@types/rimraf": "^2.0.2",
 		"@types/vscode": "^1.52.0",
 		"@typescript-eslint/eslint-plugin": "^4.16.0",
 		"@typescript-eslint/parser": "^4.16.0",
 		"eslint": "^7.21.0",
-		"typescript": "^4.3.5"
+		"typescript": "^4.4.2"
 	},
 	"dependencies": {
+		"@xmldom/xmldom": "^0.7.4",
+		"axios": "^0.21.4",
 		"ftp": "^0.3.10",
 		"jsonc-parser": "^0.4.2",
 		"minimist": "^0.2.1",
 		"mkdirp": "^0.5.1",
+		"qs": "^6.10.1",
 		"rimraf": "^2.6.2"
 	}
 }
