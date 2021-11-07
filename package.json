@@ -3,7 +3,7 @@
 	"displayName": "Mulesoft Exchange Tools",
 	"description": "A set of tools for managing anypoint exchange connector dependencies in a mule 4 project.",
 	"version": "0.0.1",
-	"publisher": "dsimpson",
+	"publisher": "sinia",
 	"enableProposedApi": true,
 	"private": true,
 	"license": "MIT",
@@ -108,6 +108,24 @@
 				"properties": {
 					"mulesoft.exchange.featuredConnectors": {
 						"type": "array",
+						"items": {
+							"type": "object",
+							"title": "Featured Connectors",
+							"required": [
+								"groupId",
+								"artifactId"
+							],
+							"properties": {
+								"groupId": {
+									"type": "string",
+									"minLength": 1
+								},
+								"artifactId": {
+									"type": "string",
+									"minLength": 1
+								}
+							}
+						},
 						"default": [
 							{
 								"groupId": "org.mule.modules",
